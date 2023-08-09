@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>One Drive - link converter</title>
+</head>
+<body>
+
+    <style>
+        #file_input{
+            border: 1px solid #0078D4;
+            padding: 10px 20px;
+            width: 100%;
+            max-width: 500px;
+            margin-bottom: 20px;
+        }
+        #file_download{
+            border-radius: 4px;
+            background-color: #0078D4;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            width: auto;
+            display: inline-block;
+            max-width: 200px;
+            text-align: center;
+            font-family: Arial, sans-serif;
+            text-transform: uppercase;
+            font-size: 14px;
+        }
+    </style>
+    
+    <input id="file_input" type="text" placeholder="Inserisci qui il link di onedrive">
+
+    <a href="#" id="file_download" target="_blank" style="display:none">Scarica il file</a>
+
+    <script>
+        // Ottieni un riferimento agli elementi HTML
+        var fileInput = document.getElementById("file_input");
+        var fileDownload = document.getElementById("file_download");
+
+        // Aggiungi un listener per l'evento di input
+        fileInput.addEventListener("input", function() {
+            // Ottenere il valore inserito nell'input
+            var url = fileInput.value;
+            
+            // Verifica se l'URL è valido
+            if (isValidUrl(url)) {
+                // Valora l'attributo href del tag a con il valore dell'url concatenato con "?download=1"
+                fileDownload.href = url + "?download=1";
+                fileDownload.style.display = "block";
+            } else {
+                fileDownload.style.display = "none";
+            }
+        });
+
+        // Funzione di validazione URL
+        function isValidUrl(url) {
+            // Verifica se l'URL inizia con "http://" o "https://" e se contiene "."
+            return /^https?:\/\//i.test(url) && /\./.test(url);
+        }
+    </script>
+
+</body>
+</html>
