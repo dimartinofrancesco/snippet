@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orario lavoro</title>
+</head>
+<body>
+
+    <style>
+        #ora_ingresso{
+            border: 1px solid #0078D4;
+            padding: 10px 20px;
+            width: 100%;
+            max-width: 100px;
+            margin-bottom: 20px;
+        }
+        #ora_uscita_proposta{
+            border-radius: 4px;
+            background-color: #0078D4;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            width: auto;
+            display: inline-block;
+            max-width: 200px;
+            text-align: left;
+            font-family: Arial, sans-serif;
+            text-transform: uppercase;
+            font-size: 14px;
+            line-height: 1.6em;
+        }
+        #ora_uscita_proposta #ora_uscita__normale{
+            font-weight: bold;
+        }
+    </style>
+    
+    <p>
+        Ora di ingresso
+        <input id="ora_ingresso" type="time" min="07:30" max="18:00" value="07:30">
+    </p>
+
+
+    <p  id="ora_uscita_proposta">
+        Ora di Uscita:
+        <span id="ora_uscita__normale"></span><br>
+        Ore lavorate: 
+        <span id="ora_uscita__lavorate"></span><br>
+        Buono pasto: 
+        <span id="ora_uscita__buono_pasto"></span><br>
+        --<br>
+        Ora di Uscita senza permesso:
+        <span id="ora_uscita__senza_permesso"></span><br>
+        
+    </p>
+
+
+    <script>
+        var oraInput = document.getElementById("ora_ingresso");
+        var oraUscitaNormale = document.getElementById("ora_uscita__normale");
+        var oraUscitaBuono = document.getElementById("ora_uscita__buono_pasto");
+        var oraUscitaLavorate = document.getElementById("ora_uscita__lavorate");
+        var oraUscitaNoPermesso = document.getElementById("ora_uscita__senza_permesso");
+        
+        oraInput.addEventListener("change", visualizzaCalcolo);
+
+        function visualizzaCalcolo(){
+            var ora = oraInput.value;
+            var oraUscita =  addTimes(ora, "07:42");
+            oraUscitaNormale.innerHTML = addTimes(ora, "07:42");
+            oraUscitaNoPermesso.innerHTML = addTimes(ora, "07:27");
+            var seiOreEuNMinuto = 60*6 + 1;
+            var diffEntrataUscita = subtractTimes(oraUscita, ora);
+            oraUscitaBuono.innerHTML = (timeToMins(diffEntrataUscita) - seiOreEuNMinuto) >= 0 ? "Si" : "No";
+            oraUscitaLavorate.innerHTML = (timeToMins(diffEntrataUscita) - seiOreEuNMinuto) >= 0 ? subtractTimes(diffEntrataUscita, "00:30") : diffEntrataUscita;
+
+        }
+
+        function timeToMins(time) {
+            var b = time.split(':');
+            return b[0]*60 + +b[1];
+        }
+
+        function timeFromMins(mins) {
+            function z(n){return (n<10? '0':'') + n;}
+            var h = (mins/60 |0) % 24;
+            var m = mins % 60;
+            return z(h) + ':' + z(m);
+        }
+
+        function addTimes(t0, t1) {
+            return timeFromMins(timeToMins(t0) + timeToMins(t1));
+        }
+
+        function subtractTimes(t0, t1) {
+            return timeFromMins(timeToMins(t0) - timeToMins(t1));
+        }
+
+        visualizzaCalcolo();
+
+        
+    </script>
+
+</body>
+</html>
