@@ -45,11 +45,24 @@
 
     <p id="avviso_orario__ingresso"></p>
 
+    <p>
+        Pausa pranzo inizio
+        <input id="pranzo__inizio" type="time" min="07:30" max="20:00" value="07:30">
+    </p>
+
+    <p>
+        Pausa pranzo fine
+        <input id="pranzo__fine" type="time" min="07:30" max="20:00" value="07:30">
+    </p>
+
     <p  id="ora_uscita_proposta">
         Ora di Uscita:
         <span id="ora_uscita__normale"></span><br>
         Ore lavorate: 
         <span id="ora_uscita__lavorate"></span><br>
+        --<br>
+        Durata pausa pranzo: 
+        <span id="ora_uscita__durata_pasto"></span><br>
         Buono pasto: 
         <span id="ora_uscita__buono_pasto"></span><br>
         --<br>
@@ -66,22 +79,35 @@
         var oraUscitaLavorate = document.getElementById("ora_uscita__lavorate");
         var oraUscitaNoPermesso = document.getElementById("ora_uscita__senza_permesso");
         var avvisoOrarioIngresso = document.getElementById("avviso_orario__ingresso");
+        var oraUscitaDurataPasto = document.getElementById("ora_uscita__durata_pasto");
+        var pranzoInizio = document.getElementById("pranzo__inizio");
+        var pranzoFine = document.getElementById("pranzo__fine");
         
         oraInput.addEventListener("change", visualizzaCalcolo);
 
         function visualizzaCalcolo(){
-            var ora = oraInput.value;
+            var oraEntrata = oraInput.value;
+
+            var pranzoInizioVal = addTimes(oraEntrata, "06:00");
+            pranzoInizio.value = pranzoInizioVal;
+
+            var pranzoFineVal = addTimes(pranzoInizioVal, "00:30");
+            pranzoFine.value = pranzoFineVal;
             
-            var oraUscita =  addTimes(ora, "07:42");
-            oraUscitaNormale.innerHTML = addTimes(ora, "07:42");
-            oraUscitaNoPermesso.innerHTML = addTimes(ora, "07:27");
+            var oraUscita =  addTimes(oraEntrata, "07:42");
+            oraUscitaNormale.innerHTML = addTimes(oraEntrata, "07:42");
+            oraUscitaNoPermesso.innerHTML = addTimes(oraEntrata, "07:27");
             var seiOreEuNMinuto = 60*6 + 1;
-            var diffEntrataUscita = subtractTimes(oraUscita, ora);
+            var diffEntrataUscita = subtractTimes(oraUscita, oraEntrata);
             oraUscitaBuono.innerHTML = (timeToMins(diffEntrataUscita) - seiOreEuNMinuto) >= 0 ? "Si" : "No";
+            oraUscitaDurataPasto.innerHTML =  (timeToMins(diffEntrataUscita) - seiOreEuNMinuto) >= 0 ? subtractTimes(pranzoFineVal, pranzoInizioVal) : "0";
+            
             oraUscitaLavorate.innerHTML = (timeToMins(diffEntrataUscita) - seiOreEuNMinuto) >= 0 ? subtractTimes(diffEntrataUscita, "00:30") : diffEntrataUscita;
 
-            console.log((timeToMins(ora) - timeToMins("09:01") ));
-            avvisoOrarioIngresso.innerHTML = (timeToMins(ora) - timeToMins("09:01") < 0) ? "" : "Attenzione è necessario richiedere il permesso in ingresso"; 
+            console.log((timeToMins(oraEntrata) - timeToMins("09:01") ));
+            avvisoOrarioIngresso.innerHTML = (timeToMins(oraEntrata) - timeToMins("09:01") < 0) ? "" : "Attenzione è necessario richiedere il permesso in ingresso"; 
+
+            
 
         }
 
