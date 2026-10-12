@@ -64,7 +64,7 @@ button.small{padding:4px 9px;font-size:.8rem;font-weight:400}
 .plate .inst{margin-top:calc(var(--k)*1.2mm);line-height:1.15;font-weight:700;font-size:calc(var(--k)*8.6pt);max-width:100%}
 .plate .inst div{white-space:nowrap}
 .plate .main{flex:1;min-height:0;width:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;padding-top:calc(var(--k)*1.5mm);padding-bottom:calc(var(--k)*3mm)}
-.plate .office{font-weight:700;font-size:calc(var(--k)*15pt);line-height:1.05;white-space:nowrap;max-width:100%;margin-bottom:calc(var(--k)*4mm)}
+.plate .office{font-weight:700;font-size:calc(var(--k)*30pt);line-height:1.02;letter-spacing:-.005em;max-width:100%;text-wrap:balance;overflow-wrap:normal;margin-bottom:calc(var(--k)*4mm)}
 .plate .names{display:flex;justify-content:center;align-items:flex-start;max-width:100%;column-gap:calc(var(--k)*16mm)}
 .plate .col{display:flex;flex-direction:column;align-items:flex-start;text-align:left;row-gap:calc(var(--k)*.5mm)}
 .plate .pname{white-space:nowrap;font-weight:400;line-height:1.15}
@@ -82,7 +82,7 @@ button.small{padding:4px 9px;font-size:.8rem;font-weight:400}
 .plate.n3 .pname{font-size:calc(var(--k)*10.5pt)}
 .plate.n4 .pname{font-size:calc(var(--k)*10.5pt)}
 .plate.n5 .pname,.plate.n6 .pname{font-size:calc(var(--k)*9.5pt)}
-.plate.many .office{font-size:calc(var(--k)*13pt)}
+.plate.many .office{font-size:calc(var(--k)*26pt)}
 
 /* ===== Stampa: A4 verticale, quante targhe ci stanno ===== */
 #printArea{display:none}
@@ -277,7 +277,15 @@ button.small{padding:4px 9px;font-size:.8rem;font-weight:400}
       const inst = [...pl.querySelectorAll(".inst div")];
       inst.forEach(e => { e.style.maxWidth = pl.clientWidth - parseFloat(getComputedStyle(pl).paddingLeft)*2 + "px"; });
       shrinkW(inst);
-      const off = pl.querySelector(".office"); if(off) shrinkW([off]);
+      // ufficio: parte grande, va su due righe se serve, si riduce solo se supera due righe o una parola non entra
+      const off = pl.querySelector(".office");
+      const offLines = () => off.offsetHeight / (parseFloat(getComputedStyle(off).fontSize) * 1.02);
+      const offTooBig = () => off.scrollWidth > off.clientWidth + 1 || offLines() > 2.1;
+      if(off){
+        off.style.fontSize = "";
+        let os = parseFloat(getComputedStyle(off).fontSize), go = 80;
+        while(offTooBig() && go-- > 0){ os *= .96; off.style.fontSize = os + "px"; }
+      }
       // stesso corpo per tutti i nominativi, ridotto finché il blocco sta nella larghezza
       const names = [...pl.querySelectorAll(".pname")];
       const box = pl.querySelector(".names");
@@ -285,9 +293,13 @@ button.small{padding:4px 9px;font-size:.8rem;font-weight:400}
       let ns = parseFloat(getComputedStyle(names[0]).fontSize), gw = 60;
       while(box.scrollWidth > box.clientWidth + 1 && gw-- > 0){ ns *= .96; names.forEach(e => e.style.fontSize = ns + "px"); }
       const main = pl.querySelector(".main");
-      let g = 40;
+      // se manca spazio in altezza riduce prima l'ufficio (fino a un minimo leggibile), poi anche i nomi
+      const minOff = 14 * (96/72) * parseFloat(getComputedStyle(pl).getPropertyValue("--k"));
+      let g = 80;
       while(main.scrollHeight > main.clientHeight + 1 && g-- > 0){
-        [off, ...names].filter(Boolean).forEach(e => e.style.fontSize = parseFloat(getComputedStyle(e).fontSize) * .95 + "px");
+        const os = off ? parseFloat(getComputedStyle(off).fontSize) : 0;
+        if(off && os > minOff){ off.style.fontSize = os * .95 + "px"; }
+        else { [off, ...names].filter(Boolean).forEach(e => e.style.fontSize = parseFloat(getComputedStyle(e).fontSize) * .95 + "px"); }
       }
     });
   }
