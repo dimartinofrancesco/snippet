@@ -58,7 +58,7 @@ button.small{padding:4px 9px;font-size:.8rem;font-weight:400}
 .plate{--k:1;width:145mm;height:75mm;background:#fff;color:var(--blu);position:relative;overflow:hidden;
   box-shadow:0 2px 12px rgba(0,0,0,.2);outline:.2mm solid #c3c9d4;
   display:flex;flex-direction:column;align-items:center;text-align:center;
-  padding:calc(var(--k)*4.5mm) calc(var(--k)*7mm) calc(var(--k)*3.5mm);font-family:var(--font)}
+  padding:calc(var(--k)*7.5mm) calc(var(--k)*7mm) calc(var(--k)*6.5mm);  /* +3 mm sopra e sotto per il supporto */font-family:var(--font)}
 .plate .logo{height:calc(var(--k)*13mm);width:auto;max-width:70%;display:block;flex-shrink:0}
 .plate .ph{height:calc(var(--k)*13mm);width:calc(var(--k)*50mm);border:.3mm dashed #b7bfcc;display:grid;place-items:center;font-size:calc(var(--k)*7pt);color:#8a93a3}
 .plate .inst{margin-top:calc(var(--k)*1.2mm);line-height:1.15;font-weight:700;font-size:calc(var(--k)*8.6pt);max-width:100%}
@@ -109,7 +109,7 @@ button.small{padding:4px 9px;font-size:.8rem;font-weight:400}
 <div class="app">
   <form class="panel" id="form" autocomplete="off">
     <label for="ufficio">Ufficio
-      <input type="text" id="ufficio" list="uffici" value="Soprintendente">
+      <input type="text" id="ufficio" list="uffici" value="Cultura">
       <datalist id="uffici">
         <option value="Soprintendente"><option value="Segreteria della Soprintendente"><option value="Ufficio Tecnico">
         <option value="Area Patrimonio Archeologico"><option value="Area Patrimonio Architettonico"><option value="Area Paesaggio">
@@ -194,7 +194,7 @@ button.small{padding:4px 9px;font-size:.8rem;font-weight:400}
   probe.onload = () => render();
   probe.src = LOGO_URL;
 
-  let people = [{ titolo:"Dott.ssa Arch.", nome:"Anna Onesti" }];
+  let people = [{ titolo:"Dott.ssa", nome:"Giada Trotula" }];
   let queue = [];
   try{ queue = JSON.parse(store.get("targa_queue") || "[]"); }catch(e){ queue = []; }
 
