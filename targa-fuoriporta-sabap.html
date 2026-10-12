@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Targhe fuoriporta SABAP SA-AV</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Titillium+Web:wght@300;400;600;700&display=swap">
+<style>
+/* Layout: pannello di compilazione a sinistra, anteprima della targa a destra; in stampa restano solo le targhe su A4 */
+:root{
+  --ink:#16243a; --muted:#5b6578; --accent:#0b4f8a; --line:#d5dbe5; --panel:#ffffff; --bg:#eef1f5;
+  --font:"Titillium Web","Segoe UI",Arial,sans-serif;
+  --blu:#2a3f9d;   /* blu della targa, ripreso dal logo MiC */
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--ink:#e6ebf2;--muted:#9aa5b8;--accent:#6fb0ee;--line:#334056;--panel:#1b2433;--bg:#111823;color-scheme:dark}}
+:root[data-theme="dark"]{--ink:#e6ebf2;--muted:#9aa5b8;--accent:#6fb0ee;--line:#334056;--panel:#1b2433;--bg:#111823;color-scheme:dark}
+
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15px;padding-inline:16px;padding-block:20px}
+h1{font-size:1.35rem;margin:0 0 .2rem;font-weight:700;text-wrap:balance}
+.sub{color:var(--muted);margin:0 0 1.2rem;font-size:.92rem}
+.app{display:grid;grid-template-columns:minmax(0,380px) minmax(0,1fr);gap:20px;max-width:1300px;margin:0 auto}
+@media (max-width:900px){.app{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:18px;display:flex;flex-direction:column;gap:14px;min-width:0}
+label{display:flex;flex-direction:column;gap:4px;font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600}
+input[type=text],input[type=number]{font:inherit;font-size:1rem;text-transform:none;letter-spacing:0;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:5px;padding:8px 10px;width:100%;min-width:0}
+input:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btns{display:flex;flex-wrap:wrap;gap:8px}
+button{font:inherit;font-weight:600;border-radius:5px;padding:8px 14px;cursor:pointer;border:1px solid var(--line);background:var(--panel);color:var(--ink)}
+button:disabled{opacity:.5;cursor:default}
+button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+:root[data-theme="dark"] button.primary{color:#0d1520}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) button.primary{color:#0d1520}}
+button.small{padding:4px 9px;font-size:.8rem;font-weight:400}
+.sep{border:0;border-top:1px solid var(--line);margin:2px 0}
+.sec{font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:0;font-weight:600;display:flex;justify-content:space-between;align-items:center}
+.people{display:flex;flex-direction:column;gap:8px}
+.person{display:grid;grid-template-columns:24px 104px minmax(0,1fr) auto;gap:6px;align-items:center}
+.person .n{color:var(--muted);font-size:.85rem;text-align:right;font-variant-numeric:tabular-nums}
+.person input{padding:6px 8px;font-size:.95rem}
+.dims{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.printnote{border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:5px;padding:10px 12px;font-size:.88rem;line-height:1.45;background:var(--bg)}
+.printnote b{display:block;margin-bottom:4px;color:var(--accent)}
+.printnote ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:2px}
+.queue ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px;font-size:.92rem}
+.queue li div{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.queue li span{overflow-wrap:anywhere}
+.empty{color:var(--muted);font-size:.88rem;margin:0}
+
+.preview{min-width:0}
+.stage{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:24px;overflow:hidden;display:flex;justify-content:center}
+.scaler{position:relative}
+.meta{color:var(--muted);font-size:.85rem;margin:8px 0 0;text-align:center}
+
+/* ===== Targa: dimensioni in mm, tutte le misure scalano con --k (1 = targa alta 75 mm) ===== */
+.plate{--k:1;width:145mm;height:75mm;background:#fff;color:var(--blu);position:relative;overflow:hidden;
+  box-shadow:0 2px 12px rgba(0,0,0,.2);outline:.2mm solid #c3c9d4;
+  display:flex;flex-direction:column;align-items:center;text-align:center;
+  padding:calc(var(--k)*4.5mm) calc(var(--k)*7mm) calc(var(--k)*3.5mm);font-family:var(--font)}
+.plate .logo{height:calc(var(--k)*13mm);width:auto;max-width:70%;display:block;flex-shrink:0}
+.plate .ph{height:calc(var(--k)*13mm);width:calc(var(--k)*50mm);border:.3mm dashed #b7bfcc;display:grid;place-items:center;font-size:calc(var(--k)*7pt);color:#8a93a3}
+.plate .inst{margin-top:calc(var(--k)*1.2mm);line-height:1.15;font-weight:700;font-size:calc(var(--k)*8.6pt);max-width:100%}
+.plate .inst div{white-space:nowrap}
+.plate .main{flex:1;min-height:0;width:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;padding-top:calc(var(--k)*1.5mm);padding-bottom:calc(var(--k)*3mm)}
+.plate .office{font-weight:700;font-size:calc(var(--k)*15pt);line-height:1.05;white-space:nowrap;max-width:100%;margin-bottom:calc(var(--k)*4mm)}
+.plate .names{display:flex;justify-content:center;align-items:flex-start;max-width:100%;column-gap:calc(var(--k)*16mm)}
+.plate .col{display:flex;flex-direction:column;align-items:flex-start;text-align:left;row-gap:calc(var(--k)*.5mm)}
+.plate .pname{white-space:nowrap;font-weight:400;line-height:1.15}
+.plate .room{flex-shrink:0;width:100%;border-top:.25mm solid var(--blu);padding-top:calc(var(--k)*1.1mm);font-weight:600;font-size:calc(var(--k)*6.5pt);line-height:1;letter-spacing:.16em;text-transform:uppercase;text-align:center}
+.plate .room b{font-weight:700;letter-spacing:.06em;margin-left:.35em}
+
+/* una persona: centrata; più persone: blocco in basso, nomi allineati a sinistra (a bandiera) */
+.plate.n1 .col{align-items:center;text-align:center}
+/* più persone: nomi in basso, ufficio centrato nello spazio tra testata e nomi; le colonne partono dalla stessa riga */
+.plate:not(.n1) .main{justify-content:flex-start}
+.plate:not(.n1) .office{margin-top:auto;margin-bottom:auto;padding-block:calc(var(--k)*1.5mm)}
+.plate:not(.n1) .names{margin-top:0}
+.plate.n1 .pname{font-size:calc(var(--k)*14pt)}
+.plate.n2 .pname{font-size:calc(var(--k)*12pt)}
+.plate.n3 .pname{font-size:calc(var(--k)*10.5pt)}
+.plate.n4 .pname{font-size:calc(var(--k)*10.5pt)}
+.plate.n5 .pname,.plate.n6 .pname{font-size:calc(var(--k)*9.5pt)}
+.plate.many .office{font-size:calc(var(--k)*13pt)}
+
+/* ===== Stampa: A4 verticale, quante targhe ci stanno ===== */
+#printArea{display:none}
+.page{width:210mm;height:297mm;display:flex;flex-direction:column;align-items:center;justify-content:space-evenly}
+.page .plate{box-shadow:none}
+
+@page{size:A4 portrait;margin:0}
+@media print{
+  body{background:#fff;padding:0}
+  .app,header{display:none!important}
+  #printArea{display:block}
+  .page{page-break-after:always;break-after:page}
+  .page:last-child{page-break-after:auto;break-after:auto}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header style="max-width:1300px;margin:0 auto">
+  <h1>Targhe fuoriporta · SABAP SA-AV</h1>
+  <p class="sub">Indica l'ufficio e le persone della stanza (fino a 6): la disposizione si adatta da sola. Il numero di stanza compare solo se lo compili.</p>
+</header>
+
+<div class="app">
+  <form class="panel" id="form" autocomplete="off">
+    <label for="ufficio">Ufficio
+      <input type="text" id="ufficio" list="uffici" value="Soprintendente">
+      <datalist id="uffici">
+        <option value="Soprintendente"><option value="Segreteria della Soprintendente"><option value="Ufficio Tecnico">
+        <option value="Area Patrimonio Archeologico"><option value="Area Patrimonio Architettonico"><option value="Area Paesaggio">
+        <option value="Area Patrimonio Storico e Artistico"><option value="Area Amministrativo-Contabile"><option value="Ufficio Personale">
+        <option value="Ufficio Protocollo"><option value="Ufficio Contratti e Gare"><option value="Ufficio Promozione e Comunicazione">
+        <option value="Ufficio Informatico"><option value="Archivio"><option value="Biblioteca">
+      </datalist>
+    </label>
+
+    <div>
+      <p class="sec"><span>Persone nella stanza</span><span id="countLbl">1 di 6</span></p>
+      <datalist id="titoli">
+        <option value="Dott."><option value="Dott.ssa"><option value="Arch."><option value="Ing.">
+        <option value="Geom."><option value="Prof."><option value="Prof.ssa"><option value="Avv.">
+        <option value="Sig."><option value="Sig.ra"><option value="Dott. Arch."><option value="Dott.ssa Arch.">
+      </datalist>
+      <div class="people" id="people" style="margin-top:8px"></div>
+      <div class="btns" style="margin-top:8px"><button type="button" id="addPerson">+ Aggiungi persona</button></div>
+    </div>
+
+    <label for="stanza">Numero di stanza (facoltativo)
+      <input type="text" id="stanza" value="" placeholder="es. 12 oppure 1.04">
+    </label>
+
+    <div class="dims">
+      <label for="w">Larghezza targa (mm)<input type="number" id="w" value="145" min="60" max="200" step="1"></label>
+      <label for="h">Altezza targa (mm)<input type="number" id="h" value="75" min="40" max="140" step="1"></label>
+    </div>
+
+    <div class="printnote" role="note">
+      <b>Prima di stampare</b>
+      <ul>
+        <li>Carta: <strong>A4 verticale</strong></li>
+        <li>Margini: <strong>Nessuno</strong></li>
+        <li>Scala: <strong>100% / Dimensioni effettive</strong>. Non usare “Adatta alla pagina” o “Riduci”, altrimenti la targa non rispetta le misure</li>
+        <li>Intestazioni e piè di pagina: <strong>disattivati</strong></li>
+        <li>Grafica di sfondo: <strong>attivata</strong></li>
+      </ul>
+    </div>
+
+    <div class="btns">
+      <button type="button" class="primary" id="printOne">Stampa questa targa</button>
+      <button type="button" id="addQueue">Aggiungi all'elenco</button>
+    </div>
+
+    <hr class="sep">
+
+    <div class="queue">
+      <p class="sec" style="margin-bottom:6px">Elenco da stampare</p>
+      <ol id="queueList"></ol>
+      <p class="empty" id="queueEmpty">Nessuna targa in elenco. Usa “Aggiungi all'elenco” per stampare più stanze insieme.</p>
+      <div class="btns" style="margin-top:10px">
+        <button type="button" class="primary" id="printAll" disabled>Stampa tutto l'elenco</button>
+        <button type="button" id="clearQueue" disabled>Svuota</button>
+      </div>
+    </div>
+  </form>
+
+  <section class="preview">
+    <div class="stage" id="stage"><div class="scaler" id="scaler"></div></div>
+    <p class="meta" id="meta"></p>
+  </section>
+</div>
+
+<div id="printArea"></div>
+
+<script>
+(function(){
+  const INST1 = "Soprintendenza Archeologia, Belle Arti e Paesaggio";
+  const INST2 = "per le province di Salerno e Avellino";
+  const LOGO_URL = "https://media.beniculturali.it/mibac/files/6/MiC_logo_esteso_BLU.svg";
+  const MAX = 6;
+  const $ = id => document.getElementById(id);
+  const store = {
+    get(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } },
+    set(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+  };
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+  const logoSrc = LOGO_URL;
+  const probe = new Image();
+  probe.onload = () => render();
+  probe.src = LOGO_URL;
+
+  let people = [{ titolo:"Dott.ssa Arch.", nome:"Anna Onesti" }];
+  let queue = [];
+  try{ queue = JSON.parse(store.get("targa_queue") || "[]"); }catch(e){ queue = []; }
+
+  /* ---------- elenco persone nel modulo ---------- */
+  function drawPeople(){
+    const box = $("people");
+    box.innerHTML = "";
+    people.forEach((p,i) => {
+      const row = document.createElement("div");
+      row.className = "person";
+      row.innerHTML = `<span class="n">${i+1}</span>
+        <input type="text" id="tit${i}" list="titoli" placeholder="Titolo" aria-label="Titolo persona ${i+1}" value="${esc(p.titolo)}">
+        <input type="text" id="nom${i}" placeholder="Nome e cognome" aria-label="Nome e cognome persona ${i+1}" value="${esc(p.nome)}">
+        <button type="button" class="small" data-rm="${i}" ${people.length===1?"disabled":""} aria-label="Togli persona ${i+1}">Togli</button>`;
+      box.appendChild(row);
+    });
+    $("addPerson").disabled = people.length >= MAX;
+    $("countLbl").textContent = `${people.length} di ${MAX}`;
+  }
+  $("people").addEventListener("input", e => {
+    const m = e.target.id.match(/^(tit|nom)(\d+)$/); if(!m) return;
+    people[+m[2]][m[1]==="tit"?"titolo":"nome"] = e.target.value;
+    render();
+  });
+  $("people").addEventListener("click", e => {
+    const i = e.target.dataset.rm; if(i === undefined) return;
+    people.splice(+i,1); drawPeople(); render();
+  });
+  $("addPerson").addEventListener("click", () => {
+    if(people.length >= MAX) return;
+    people.push({ titolo:"", nome:"" }); drawPeople(); render();
+    $("nom"+(people.length-1)).focus();
+  });
+
+  /* ---------- costruzione della targa ---------- */
+  function data(){
+    return {
+      ufficio: $("ufficio").value,
+      stanza: $("stanza").value,
+      w: Math.min(200, Math.max(60, +$("w").value || 145)),
+      h: Math.min(140, Math.max(40, +$("h").value || 75)),
+      people: people.map(p => ({...p}))
+    };
+  }
+
+  function plate(d){
+    const list = d.people.filter(p => p.nome.trim() || p.titolo.trim());
+    const n = Math.max(1, list.length);
+    const el = document.createElement("div");
+    el.className = `plate n${n}` + (n >= 4 ? " many" : "");
+    el.style.width = d.w + "mm";
+    el.style.height = d.h + "mm";
+    el.style.setProperty("--k", (d.h / 75).toFixed(4));
+    const items = (list.length ? list : [{titolo:"", nome:"Nome Cognome"}]).map(p =>
+      `<div class="pname">${p.titolo.trim() ? `${esc(p.titolo.trim())} ` : ""}${esc(p.nome.trim())}</div>`);
+    // fino a 3 persone una colonna; da 4 in su due colonne (la prima con una persona in più se dispari)
+    const cols = items.length >= 4 ? [items.slice(0, Math.ceil(items.length/2)), items.slice(Math.ceil(items.length/2))] : [items];
+    const names = cols.map(c => `<div class="col">${c.join("")}</div>`).join("");
+    el.innerHTML = `
+      <img class="logo" src="${esc(logoSrc)}" alt="Ministero della Cultura">
+      <div class="inst"><div>${INST1}</div><div>${INST2}</div></div>
+      <div class="main">
+        ${d.ufficio.trim() ? `<div class="office">${esc(d.ufficio.trim())}</div>` : ""}
+        <div class="names">${names}</div>
+      </div>
+      ${d.stanza.trim() ? `<div class="room">Stanza <b>${esc(d.stanza.trim())}</b></div>` : ""}`;
+    return el;
+  }
+
+  // adatta i testi: prima in larghezza riga per riga, poi in altezza tutto il blocco centrale
+  function fit(root){
+    root.querySelectorAll(".plate").forEach(pl => {
+      const shrinkW = (els) => {
+        els.forEach(e => e.style.fontSize = "");
+        let size = parseFloat(getComputedStyle(els[0]).fontSize), g = 60;
+        const over = () => els.some(e => e.scrollWidth > e.clientWidth + 1);
+        while(over() && g-- > 0){ size *= .96; els.forEach(e => e.style.fontSize = size + "px"); }
+        return size;
+      };
+      const inst = [...pl.querySelectorAll(".inst div")];
+      inst.forEach(e => { e.style.maxWidth = pl.clientWidth - parseFloat(getComputedStyle(pl).paddingLeft)*2 + "px"; });
+      shrinkW(inst);
+      const off = pl.querySelector(".office"); if(off) shrinkW([off]);
+      // stesso corpo per tutti i nominativi, ridotto finché il blocco sta nella larghezza
+      const names = [...pl.querySelectorAll(".pname")];
+      const box = pl.querySelector(".names");
+      names.forEach(e => e.style.fontSize = "");
+      let ns = parseFloat(getComputedStyle(names[0]).fontSize), gw = 60;
+      while(box.scrollWidth > box.clientWidth + 1 && gw-- > 0){ ns *= .96; names.forEach(e => e.style.fontSize = ns + "px"); }
+      const main = pl.querySelector(".main");
+      let g = 40;
+      while(main.scrollHeight > main.clientHeight + 1 && g-- > 0){
+        [off, ...names].filter(Boolean).forEach(e => e.style.fontSize = parseFloat(getComputedStyle(e).fontSize) * .95 + "px");
+      }
+    });
+  }
+
+  function scale(){
+    const stage = $("stage"), sc = $("scaler"), pl = sc.firstElementChild;
+    if(!pl) return;
+    const avail = stage.clientWidth - 48;
+    const s = Math.min(1.6, avail / pl.offsetWidth);
+    pl.style.transformOrigin = "top left";
+    pl.style.transform = `scale(${s})`;
+    sc.style.width = (pl.offsetWidth * s) + "px";
+    sc.style.height = (pl.offsetHeight * s) + "px";
+  }
+
+  function perPage(d){ return Math.max(1, Math.floor((297 - 12) / (d.h + 8))); }
+
+  function render(){
+    const d = data();
+    const sc = $("scaler");
+    sc.innerHTML = "";
+    sc.appendChild(plate(d));
+    fit(sc);
+    scale();
+    const k = perPage(d);
+    $("meta").textContent = `Targa ${d.w} × ${d.h} mm · ${k} per foglio A4`;
+  }
+
+  function doPrint(list){
+    const area = $("printArea");
+    area.innerHTML = "";
+    let pg = null, count = 0, k = 1;
+    list.forEach(d => {
+      k = perPage(d);
+      if(!pg || count >= k){ pg = document.createElement("div"); pg.className = "page"; area.appendChild(pg); count = 0; }
+      pg.appendChild(plate(d)); count++;
+    });
+    area.style.cssText = "display:block;position:absolute;left:-9999px;top:0";
+    fit(area);
+    area.style.cssText = "";
+    window.print();
+  }
+
+  /* ---------- elenco di stampa ---------- */
+  function label(d){
+    const ps = d.people.filter(p => p.nome.trim()).map(p => p.nome.trim());
+    return `${d.stanza.trim() ? "Stanza " + d.stanza.trim() + " · " : ""}${d.ufficio.trim() || "—"}` +
+           (ps.length ? ` (${ps.length === 1 ? ps[0] : ps.length + " persone"})` : "");
+  }
+  function renderQueue(){
+    const ol = $("queueList");
+    ol.innerHTML = "";
+    queue.forEach((d,i) => {
+      const li = document.createElement("li");
+      li.innerHTML = `<div><span>${esc(label(d))}</span><span style="display:flex;gap:4px;flex-shrink:0">
+        <button type="button" class="small" data-edit="${i}">Modifica</button><button type="button" class="small" data-del="${i}">Togli</button></span></div>`;
+      ol.appendChild(li);
+    });
+    $("queueEmpty").hidden = queue.length > 0;
+    $("printAll").disabled = $("clearQueue").disabled = queue.length === 0;
+    $("printAll").textContent = queue.length ? `Stampa tutto l'elenco (${queue.length})` : "Stampa tutto l'elenco";
+    store.set("targa_queue", JSON.stringify(queue));
+  }
+  function load(d){
+    $("ufficio").value = d.ufficio; $("stanza").value = d.stanza; $("w").value = d.w; $("h").value = d.h;
+    people = d.people.length ? d.people.map(p => ({...p})) : [{titolo:"",nome:""}];
+    drawPeople(); render();
+  }
+
+  ["ufficio","stanza","w","h"].forEach(id => $(id).addEventListener("input", render));
+  $("form").addEventListener("submit", e => e.preventDefault());
+  $("printOne").addEventListener("click", () => doPrint([data()]));
+  $("addQueue").addEventListener("click", () => {
+    queue.push(data()); renderQueue();
+    load({ ufficio:"", stanza:"", w:$("w").value, h:$("h").value, people:[{titolo:"",nome:""}] });
+    $("ufficio").focus();
+  });
+  $("queueList").addEventListener("click", e => {
+    const t = e.target.dataset;
+    if(t.del !== undefined){ queue.splice(+t.del,1); renderQueue(); }
+    if(t.edit !== undefined){ const d = queue.splice(+t.edit,1)[0]; renderQueue(); load(d); }
+  });
+  $("printAll").addEventListener("click", () => doPrint(queue));
+  $("clearQueue").addEventListener("click", () => { queue = []; renderQueue(); });
+
+  window.addEventListener("resize", scale);
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(render);
+  drawPeople(); renderQueue(); render();
+})();
+</script>
+</body>
+</html>
