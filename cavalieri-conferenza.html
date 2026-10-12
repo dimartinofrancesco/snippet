@@ -52,14 +52,18 @@ button.small{padding:4px 9px;font-size:.8rem;font-weight:400}
 .stage{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:16px;overflow:hidden}
 .scaler{position:relative}
 
-/* ===== Foglio A4 orizzontale piegato in lunghezza: due facciate 297 x 105 mm ===== */
-.sheet{width:297mm;height:210mm;background:#fff;color:var(--blu);position:relative;box-shadow:0 2px 10px rgba(0,0,0,.18);display:grid;grid-template-rows:105mm 105mm;grid-template-columns:minmax(0,1fr);overflow:hidden;font-family:var(--font)}
-.half{position:relative;padding:9mm 12mm 7mm;display:flex;flex-direction:column;min-height:0;min-width:0}
-.half.top{transform:rotate(180deg)}
-.fold{position:absolute;left:0;right:0;top:105mm;border-top:.2mm dashed #9aa3b2}
-.fold::after{content:"piegare qui";position:absolute;right:4mm;top:-4mm;font:7pt var(--font);color:#9aa3b2}
+/* ===== Foglio A4 orizzontale: base 20 mm + facciata 85 mm + facciata 85 mm + base 20 mm ===== */
+.sheet{width:297mm;height:210mm;background:#fff;color:var(--blu);position:relative;box-shadow:0 2px 10px rgba(0,0,0,.18);display:grid;grid-template-rows:20mm 85mm 85mm 20mm;grid-template-columns:minmax(0,1fr);overflow:hidden;font-family:var(--font)}
+.half{position:relative;padding:4mm 12mm 7mm;display:flex;flex-direction:column;min-height:0;min-width:0}
+.half.top,.flap.top{transform:rotate(180deg)}
+.flap{display:flex;align-items:center;justify-content:center;gap:10mm;padding:0 12mm;background:#f3f5fa;color:#7a849a;font-size:8.5pt;line-height:1.3;text-align:center}
+.flap b{color:#4c5873;font-weight:700}
+.flap .step{display:flex;align-items:center;gap:2.5mm}
+.flap .num{flex-shrink:0;width:5.5mm;height:5.5mm;border-radius:50%;border:.3mm solid #7a849a;display:grid;place-items:center;font-weight:700;font-size:7.5pt;color:#4c5873}
+.fold{position:absolute;left:0;right:0;border-top:.25mm dashed #8a93a3}
+.fold.f1{top:20mm} .fold.f2{top:105mm} .fold.f3{top:190mm}
+.fold.f2{border-top-color:#b7bfcc}
 .sheet.nofold .fold{display:none}
-
 .who{flex:1;min-height:0;min-width:0;width:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:2mm;overflow:hidden}
 .pname{font-weight:700;line-height:1;white-space:nowrap;letter-spacing:-.01em;overflow-wrap:normal}
 .pname .tit{font-weight:400;font-size:.55em;letter-spacing:0;margin-right:.3em}
@@ -83,7 +87,6 @@ button.small{padding:4px 9px;font-size:.8rem;font-weight:400}
   #printArea{display:block}
   #printArea .sheet{box-shadow:none;page-break-after:always;break-after:page}
   #printArea .sheet:last-child{page-break-after:auto;break-after:auto}
-  .fold::after{display:none}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -91,7 +94,7 @@ button.small{padding:4px 9px;font-size:.8rem;font-weight:400}
 <body>
 <header style="max-width:1400px;margin:0 auto">
   <h1>Cavalieri per conferenza · SABAP SA-AV</h1>
-  <p class="sub">Imposta una volta i dati dell'evento, poi inserisci i relatori. Ogni cavaliere è un A4 orizzontale piegato a metà nel senso della lunghezza.</p>
+  <p class="sub">Imposta una volta i dati dell'evento, poi inserisci i relatori. Ogni cavaliere è un A4 orizzontale: si piega a metà nel senso della lunghezza e le due fasce in alto e in basso si ripiegano verso l'interno come base di appoggio.</p>
 </header>
 
 <div class="app">
@@ -140,7 +143,7 @@ button.small{padding:4px 9px;font-size:.8rem;font-weight:400}
       </datalist>
     </label>
 
-    <label class="check" for="foldLine"><input type="checkbox" id="foldLine" checked> Mostra la linea di piegatura</label>
+    <label class="check" for="foldLine"><input type="checkbox" id="foldLine" checked> Mostra le linee di piegatura</label>
 
     <div class="printnote" role="note">
       <b>Prima di stampare</b>
@@ -228,10 +231,19 @@ button.small{padding:4px 9px;font-size:.8rem;font-weight:400}
     </div>`;
   }
 
+  // fasce di base: istruzioni di piegatura (restano nascoste sotto il cavaliere)
+  function flapHTML(cls){
+    return `<div class="flap ${cls}">
+      <span class="step"><span class="num">1</span><span><b>Piegare a metà</b> lungo la linea centrale, con il testo all'esterno</span></span>
+      <span class="step"><span class="num">2</span><span><b>Piegare verso l'interno</b> questa fascia lungo la linea tratteggiata: fa da base di appoggio</span></span>
+    </div>`;
+  }
+
   function sheet(p, ev){
     const el = document.createElement("div");
     el.className = "sheet" + ($("foldLine").checked ? "" : " nofold");
-    el.innerHTML = halfHTML(p, ev, "top") + halfHTML(p, ev, "bottom") + `<div class="fold"></div>`;
+    el.innerHTML = flapHTML("top") + halfHTML(p, ev, "top") + halfHTML(p, ev, "bottom") + flapHTML("bottom") +
+      `<div class="fold f1"></div><div class="fold f2"></div><div class="fold f3"></div>`;
     return el;
   }
 
